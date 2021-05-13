@@ -1,0 +1,25 @@
+CF::Background = [ h -99.43 sat 0.1373 b -0.7370 ]
+
+CF::Tile = [ skew 15 15 r 15 ]
+
+L1 =  0.01 + ( 0.45*rand_static() )
+L2 = -0.01 - ( 0.45*rand_static() )
+
+startshape H ( randint ( 3 )+3 ) []
+
+shape H ( natural n )
+{
+    if( n > 0 ) 
+    {
+        loop 6 [ r 60 h 180 ] L [ x n b 1 h 80 sat 0.6 ]
+        H ( n--1 ) [ h ( 30*randint()) ]
+    }
+}
+
+path L
+{
+    MOVETO (    0,  L1 )
+    LINETO (    0,  L2 )
+    
+    STROKE ( 0.005,  CF::RoundCap) []
+}

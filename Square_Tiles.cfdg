@@ -1,0 +1,22 @@
+startshape R []
+
+CF::Tile = [ s 1.5 ]
+CF::Background = [ b 1 sat 0.3 h 40 ]
+
+shape R
+{
+    S [ s (0.5+rand_static(1))]
+    loop 4 [ r 90 ] S [ x rand_static ( 1 ) y rand_static ( 1 ) s (0.1+rand_static(2))]
+}
+
+shape S
+{
+    SQUARE [a -0.6 sat 1 b 1 r -3..3 h (120*randint(3)) blend CF::SoftLight]
+    S_ [a -0.6]
+}
+
+path S_
+{
+    path SQUARE []
+    STROKE ( 0.02 )[]
+}
