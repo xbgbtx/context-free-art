@@ -1,0 +1,21 @@
+CF::Impure = 1
+N=randint(6,1000)
+M=floor(N/randint(1,17))
+O=floor(N*(0.1..3))
+startshape P ( N, M, O ) []
+
+vector2 p2c (p) = cos(p), sin(p)
+
+path P ( number n, number m, number o ) 
+{
+   A = (360/n) * 0.1..10
+   loop i=n [] 
+   {
+      c=p2c( mod(i*m,o) * A ) * i
+      LINETO ( c[0], c[1] )
+   }
+
+   CLOSEPOLY()
+   FILL(CF::EvenOdd)[]
+}
+
