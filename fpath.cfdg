@@ -1,17 +1,17 @@
 CF::Impure = 1
-N=randint(6,1000)
-M=floor(N/randint(1,17))
-O=floor(N*(0.1..3))
+N=randint(100,1000)
+M=N/randint(1,N/2)
+O=1..3
 startshape P ( N, M, O ) []
 
 vector2 p2c (p) = cos(p), sin(p)
 
 path P ( number n, number m, number o ) 
 {
-   A = (360/n) * 0.1..10
+   A = (360/n)
    loop i=n [] 
    {
-      c=p2c( mod(i*m,o) * A ) * i
+      c=p2c( mod(i*m,n) * A ) * (i*o)
       LINETO ( c[0], c[1] )
    }
 
