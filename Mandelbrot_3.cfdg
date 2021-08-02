@@ -1,13 +1,24 @@
 CF::Impure  = 1
 CF::Background = [ b -1 ]
 
-grid_size = 1024
-max_iter = 50
-E = 2
-E2 = E^2
 
-target = 0,0//-0.199002523, 1.100131865
-range = 2//0.00000001
+//zoomed out render
+//E = 10
+//grid_size = 1024
+//max_iter = 100
+//target = -0.7,0
+//range = 1.5
+
+//Gallery Render
+E = 2
+grid_size = 128
+max_iter = 8000
+target = -0.199002523, 1.100131866
+range = 0.000001
+
+//convert grid index to complex number
+gridR(n,t)=lerp(t-range,t+range,n/grid_size)
+vector2 gridCz(i,j)=gridR(i,target[0]), gridR(j,target[1])
 
 //Linear interpolation
 lerp(n0,n1,i)=n0+(n1-n0)*i
@@ -20,10 +31,6 @@ map_range(n,i0,j0,i1,j1)= i1 + ((n-i0)*(j1-i1)/(j0-i0))
 //complex numbers:
 
 c_mag(vector2 c) = sqrt( c[0]^2 + c[1]^2 )
-c_mag2(vector2 c) = c[0]^2 + c[1]^2
-
-vector2 c_mult(vector2 c1, vector2 c2) = 
-    c1[0]*c2[0] - c1[1]*c2[1], c1[0]*c1[1] + c2[0]*c2[1]
 
 vector2 c_add(vector2 c1, vector2 c2) = (c1[0]+c2[0]), (c1[1]+c2[1])
 
@@ -32,9 +39,8 @@ vector2 c_pow2(vector2 c)=c[0]^2 - c[1]^2, 2*c[0]*c[1]
 //set identity function
 vector2 F ( vector2 cZ, vector2 c ) = c_add( c_pow2(cZ) , c )
 
-//convert grid index to complex number
-gridR(n,t)=lerp(t-range,t+range,n/grid_size)
-vector2 gridCz(i,j)=gridR(i,target[0]), gridR(j,target[1])
+//approximate escape func
+escape(vector2 c)=abs(c[0])>E || abs(c[1])>E
 
 //Colour pattern for the bands
 num_cols = 5
@@ -58,8 +64,8 @@ shape GRID
       M ( max_iter, c, (0,0) ) []
 
 		//Target finder
-		//if( i==floor(grid_size/2) && j==floor(grid_size/2) )
-			//CIRCLE [ s 3 b 1 sat 0 z 100 ]
+		if( i==floor(grid_size/2) && j==floor(grid_size/2) )
+			CIRCLE [ s 3 b 1 sat 0 z 100 ]
    }
 }
 
@@ -69,19 +75,20 @@ shape M ( n, vector2 c, vector2 z0 )
    {
 		z1 = F ( z0, c )
 
-		if ( c_mag2 ( z1 ) > E2 ) 
-			ESC ( n, z1 ) [] 
+		if ( escape ( z1 ) ) 
+			ESC ( n, c, z1 ) [] 
 		else
 			M ( n-1, c, z1 ) []
    }
 }
 
-shape ESC ( n, vector2 z1 )
+shape ESC ( n, vector2 c, vector2 z1 )
 {
 	m=max_iter-n
 
-	//smooth E:  http://linas.org/art-gallery/escape/escape.html
-	mu=m-log(log(c_mag(z1)))/log(2)
+	//smooth escape:  http://linas.org/art-gallery/escape/escape.html
+	ec=F(F(z1, c), c)
+	mu=m-log(log(c_mag(ec)))/log(2)
 
 	i=map_range(mu,0,max_iter,0,num_cols)
 
