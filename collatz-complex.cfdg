@@ -1,0 +1,64 @@
+CF::Impure = 1
+CF::Size = [ s 1000 ]
+
+num_dots = 500
+max_steps = 100
+max_start = 1000
+
+M = 3, 0
+D = 2, 0
+
+startshape S []
+
+start_coord()=(-max_start..max_start)/2
+
+// c1 * c2
+vector2 c_mult(vector2 c1, vector2 c2) = 
+    c1[0]*c2[0] - c1[1]*c2[1], c1[0]*c1[1] + c2[0]*c2[1]
+
+// c1 / c2
+vector2 c_div(vector2 c1, vector2 c2) = 
+   let( d=(c2[0]^2+c2[1]^2); 
+      (c1[0]*c2[0] + c1[1]*c2[1])/d, 
+      (c1[0]*c2[0] - c1[1]*c2[1])/d )
+
+c_mag(vector2 c) = sqrt( c[0]^2 + c[1]^2 )
+
+
+//returns 1 if n is odd
+odd(n)=mod(floor(n),2)==1
+
+//complex numbers are odd if one component is odd
+c_odd(vector2 c)= odd(c[0]) ^^ odd(c[1])
+
+vector2 coll(vector2 c)=if(c_odd(c), c_mult(c,M), c_div(c,D)) 
+
+shape S
+{
+   loop num_dots []
+   {
+      start = start_coord(), start_coord()
+
+      CIRCLE [ x start[0] y start[1] s 10 ]
+      CC ( start, max_steps ) []
+   }
+}
+
+shape CC ( vector2 pos, n )
+{
+   if ( n > 0 )
+   {
+      next_pos = coll(pos)
+      LINE ( (0,0), next_pos ) []
+
+      if ( c_mag ( next_pos ) > 0 )
+         CC ( next_pos, n--1 ) [ x next_pos[0] y next_pos[1] ]
+   }
+}
+
+path LINE ( vector2 start, vector2 end )
+{
+   MOVETO ( start[ 0 ], start[ 1 ]  )
+   LINETO ( end[ 0 ], end[ 1 ] )
+   STROKE (1) []
+}
