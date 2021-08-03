@@ -3,18 +3,18 @@ CF::Background = [ b -1 ]
 
 
 //zoomed out render
-//E = 10
-//grid_size = 1024
-//max_iter = 100
-//target = -0.7,0
-//range = 1.5
+E = 10
+grid_size = 1024
+max_iter = 100
+target = -0.7,0
+range = 1.5
 
 //Gallery Render
-E = 2
-grid_size = 128
-max_iter = 8000
-target = -0.199002523, 1.100131866
-range = 0.000001
+//E = 2
+//grid_size = 2048
+//max_iter = 800
+//target = -0.905, 0.266
+//range = 0.03
 
 //convert grid index to complex number
 gridR(n,t)=lerp(t-range,t+range,n/grid_size)
@@ -42,13 +42,13 @@ vector2 F ( vector2 cZ, vector2 c ) = c_add( c_pow2(cZ) , c )
 //approximate escape func
 escape(vector2 c)=abs(c[0])>E || abs(c[1])>E
 
-//Colour pattern for the bands
+//Colour pattern for the bands (h, sat, b)
 num_cols = 5
 vector3 col(n)=select(n,
-	(0, 0.5, 0.2),
-   (90, 0.7, 0.8),
-   (60, 1, 0.6),
-   (279, 0.5, 0.2),
+	(-49, 0.75, 0.2),
+   (90, 0.1, 0.85),
+   (50, 0.3, 0.95),
+   (120, 0.5, 0.8),
    (0, 0, 1.0)
 )
 
@@ -64,8 +64,8 @@ shape GRID
       M ( max_iter, c, (0,0) ) []
 
 		//Target finder
-		if( i==floor(grid_size/2) && j==floor(grid_size/2) )
-			CIRCLE [ s 3 b 1 sat 0 z 100 ]
+		//if( i==floor(grid_size/2) && j==floor(grid_size/2) )
+		//	CIRCLE [ s 3 b 1 sat 0 z 100 ]
    }
 }
 
