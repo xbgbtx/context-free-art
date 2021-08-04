@@ -1,9 +1,11 @@
 CF::Impure = 1
 CF::Background = [ b -1 ]
+//CF::Size = [ s 1 x -0.5 y -0.5 ] 
 
-T=0.01
+T=1/(2^8)
+O=4
 
-startshape HC ( T, 5 ) []
+startshape HC ( T, O ) []
 
 sign(i)=if(i<0,-1,if(i>0,1,0))
 
@@ -11,27 +13,45 @@ vector2 c_add(vector2 c1, vector2 c2) = (c1[0]+c2[0]), (c1[1]+c2[1])
 
 vector2 c_mult1(m,vector2 c)=c[0]*m,c[1]*m
 
-base_4(i,n)=let(d=floor(i/4);m=mod(i,4);if(d<=n,m,base_4(d,n)))
+shift(i,n)=if(n==0,i,shift(i,n-1)*10)
+unshift(i)=if(i<=0,i,unshift(i/10))
 
-digit_count(i,n,d)=if(n==0,0,digit_count(i,n-1,d)+d==base_4(i,n))
+b4_(i,e)=if(i==0,0,
+   let(
+      m=i*4;
+      d=floor(m);
+      rem=mod(m,1); 
+      d*10^e + b4_(rem,e-1) //doesn't handle 0s correctly
+   ))
+b4(i)=b4_(i,-1)
 
-vector2 hc(t,n)=if(n==0, 
+get_digit(i,n)=let(d=floor(i*10^n);mod(d,10))
+
+//Count how many times digit d occurs the first n digits of i
+dc(i,d,n)=if(n<=0,0,(floor(mod(i,10))==d)+dc(i*10,d,n-1))
+
+vector2 hc_(t,n)=if(n==0, 
    (0,0), 
    let(
-      qj=base_4(t,n);
-      e0=digit_count(t,n,0);
-      e3=digit_count(t,n,3);
-      dj=mod(e0+e3,2);
-      hn=c_mult1( (-1^e0)/2*sign(qj), ( (1-dj)*qj-1, 1-dj*qj));
-      c_add(hc(t,n-1), hn))
-)
+      j=O-n+1;
+      q = t*10;
+      qj=get_digit(q,j);
+      e0=dc(q,0,j-1);
+      e3=dc(q,3,j-1);
+      dj=e0+mod(e3,2);
+      hn=c_mult1( ((-1^e0)/(2^j))*sign(qj), ( (1-dj)*qj-1, 1-dj*qj));
+      c_add(hc(t,n-1), hn)
+   ))
+vector2 hc(t,n)=hc_(b4(t)*10,n)
 
 shape HC ( t, o )
 {
    if ( t <= 1 )
    {
       hn = hc(t,o)
-      SQUARE [ b 1 sat 1 h (360*t) x hn[0]  y hn[1] s (T/10) ]
+      X = hn[0]
+      Y = hn[1]
+      SQUARE [ b 1 sat 1 h (360*t) x X y Y s 0.01 ]
 
       HC ( t+T, o ) []
    }
