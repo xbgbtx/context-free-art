@@ -2,8 +2,8 @@ CF::Impure = 1
 CF::Background = [ b -1 ]
 //CF::Size = [ s 1 x -0.5 y -0.5 ] 
 
-T=1/100
-O=4
+T=0.001
+O=8
 
 startshape HC ( T, O ) []
 
@@ -14,7 +14,7 @@ vector2 c_add(vector2 c1, vector2 c2) = (c1[0]+c2[0]), (c1[1]+c2[1])
 vector2 c_mult1(m,vector2 c)=c[0]*m,c[1]*m
 
 shift(i,n)=if(n==0,i,shift(i,n-1)*10)
-unshift(i)=if(i>1,i,unshift(i/10))
+unshift(i)=if(i<1,i,unshift(i/10))
 
 b4_(i,acc)=if(i==0,acc,
    let(
@@ -35,7 +35,7 @@ vector2 hc_(t,n)=if(n==0,
    let(
       j=n+1;
       q = t;
-      qj=get_digit(q,j);
+      qj=get_digit(q,j+1);
       e0=dc(q,0,j-1);
       e3=dc(q,3,j-1);
       //dj=e0+mod(e3,2);
