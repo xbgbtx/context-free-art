@@ -1,0 +1,45 @@
+CF::Impure = 1
+
+startshape GRID []
+
+grid_size=512
+
+N = 250
+
+F(i,w,k) = i+w+k*sin(360*i)
+
+//Linear interpolation
+lerp(n0,n1,i)=n0+(n1-n0)*i
+
+shape GRID
+{
+   loop i=grid_size [ x 1 ]
+   loop j=grid_size [ y 1 ]
+   {
+      w = i/grid_size
+      k = j/grid_size
+      CELL ( N, 0, w, k ) []
+   }
+}
+
+shape CELL(n,i,w,k)
+{
+   j = F(i,w,k)
+   if ( abs(j-i) < 0.003 )
+   {
+      m = N-n
+      t = m/N
+      B = if(m<10,0,1)
+      H = lerp(0,280,t)
+      SQUARE [ b B sat 1 h H ]
+   }
+   else if ( n > 0 )
+   {
+      CELL ( n-1, j, w, k ) []
+   }
+   else
+   {
+      SQUARE []
+   }
+}
+

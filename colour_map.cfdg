@@ -1,0 +1,43 @@
+CF::Impure = 1
+
+startshape GRID []
+
+grid_size=512
+
+N = 1000
+
+F(i,w,k) = i+w+k*sin(360*i)
+
+//Linear interpolation
+lerp(n0,n1,i)=n0+(n1-n0)*i
+
+c_mag(vector2 c) = sqrt( c[0]^2 + c[1]^2 )
+
+c_i(vector2 c) = c_mag(c)/sqrt(0.5)
+
+c_angle ( vector2 c ) = let( cx=c[0]; cy=c[1];
+   if ( cx == 0, 
+      if ( cy == 0, 0, if ( cy > 0, 90, 270 ) ),
+      if ( cx > 0, atan(cy/cx), 180+atan(cy/cx))
+   ))
+
+vector2 c_polar(vector2 c)=c_mag(c), c_angle(c)
+
+shape GRID
+{
+   loop i=grid_size [ x 1 ]
+   loop j=grid_size [ y 1 ]
+   {
+      c = (i/grid_size)-0.5, (j/grid_size)-0.5
+      CELL ( c ) []
+   }
+}
+
+shape CELL( vector2 c )
+{
+   P = c_polar(c)
+   SAT = P[0]
+   H = P[1]
+   SQUARE [ b 1 sat SAT h H ]
+}
+
