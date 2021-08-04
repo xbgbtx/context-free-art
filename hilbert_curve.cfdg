@@ -1,0 +1,38 @@
+CF::Impure = 1
+CF::Background = [ b -1 ]
+
+T=0.01
+
+startshape HC ( T, 5 ) []
+
+sign(i)=if(i<0,-1,if(i>0,1,0))
+
+vector2 c_add(vector2 c1, vector2 c2) = (c1[0]+c2[0]), (c1[1]+c2[1])
+
+vector2 c_mult1(m,vector2 c)=c[0]*m,c[1]*m
+
+base_4(i,n)=let(d=floor(i/4);m=mod(i,4);if(d<=n,m,base_4(d,n)))
+
+digit_count(i,n,d)=if(n==0,0,digit_count(i,n-1,d)+d==base_4(i,n))
+
+vector2 hc(t,n)=if(n==0, 
+   (0,0), 
+   let(
+      qj=base_4(t,n);
+      e0=digit_count(t,n,0);
+      e3=digit_count(t,n,3);
+      dj=mod(e0+e3,2);
+      hn=c_mult1( (-1^e0)/2*sign(qj), ( (1-dj)*qj-1, 1-dj*qj));
+      c_add(hc(t,n-1), hn))
+)
+
+shape HC ( t, o )
+{
+   if ( t <= 1 )
+   {
+      hn = hc(t,o)
+      SQUARE [ b 1 sat 1 h (360*t) x hn[0]  y hn[1] s (T/10) ]
+
+      HC ( t+T, o ) []
+   }
+}

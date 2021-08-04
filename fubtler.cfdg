@@ -4,13 +4,15 @@ startshape GRID []
 
 grid_size=512
 range = 1
+N = 10
+start=-1..1,-1..1
 
 //Linear interpolation
 lerp(n0,n1,i)=n0+(n1-n0)*i
 
 c_mag(vector2 c) = sqrt( c[0]^2 + c[1]^2 )
 
-c_i(vector2 c) = c_mag(c)/sqrt(0.5)
+vector2 c_add(vector2 c1, vector2 c2) = (c1[0]+c2[0]), (c1[1]+c2[1])
 
 c_angle ( vector2 c ) = let( cx=c[0]; cy=c[1];
    if ( cx == 0, 
@@ -20,6 +22,8 @@ c_angle ( vector2 c ) = let( cx=c[0]; cy=c[1];
 
 vector2 c_polar(vector2 c)=c_mag(c), c_angle(c)
 
+vector2 F(vector2 X)=c_add( X, ( sin(X[0]^2*360), X[0]+sin(X[1]*360) ) )
+
 shape GRID
 {
    loop i=grid_size [ x 1 ]
@@ -27,15 +31,24 @@ shape GRID
    {
       cx = lerp(-range,range,i/grid_size)
       cy = lerp(-range,range,j/grid_size)
-      CELL ( (cx,cy) ) []
+      CELL ( N, start, (cx,cy) ) []
    }
 }
 
-shape CELL( vector2 c )
+shape CELL( natural n, vector2 acc, vector2 c )
 {
-   P = c_polar(c)
-   SAT = P[0]
-   H = P[1]
-   SQUARE [ b 1 sat SAT h H ]
+   if ( n > 0 )
+   {
+      CELL( n--1, F(acc), c ) []
+   }
+   else
+   {
+      X = c_add(c,acc)
+      P = c_polar(X)
+      SAT = P[0]
+      H = P[1]
+      SQUARE [ b 1 sat SAT h H ]
+   }
 }
+
 
