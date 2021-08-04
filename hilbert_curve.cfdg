@@ -2,7 +2,7 @@ CF::Impure = 1
 CF::Background = [ b -1 ]
 //CF::Size = [ s 1 x -0.5 y -0.5 ] 
 
-T=1/(2^8)
+T=1/100
 O=4
 
 startshape HC ( T, O ) []
@@ -14,16 +14,16 @@ vector2 c_add(vector2 c1, vector2 c2) = (c1[0]+c2[0]), (c1[1]+c2[1])
 vector2 c_mult1(m,vector2 c)=c[0]*m,c[1]*m
 
 shift(i,n)=if(n==0,i,shift(i,n-1)*10)
-unshift(i)=if(i<=0,i,unshift(i/10))
+unshift(i)=if(i>1,i,unshift(i/10))
 
-b4_(i,e)=if(i==0,0,
+b4_(i,acc)=if(i==0,acc,
    let(
       m=i*4;
       d=floor(m);
       rem=mod(m,1); 
-      d*10^e + b4_(rem,e-1) //doesn't handle 0s correctly
+      b4_(rem,acc*10+d) 
    ))
-b4(i)=b4_(i,-1)
+b4(i)=unshift(b4_(i,0))
 
 get_digit(i,n)=let(d=floor(i*10^n);mod(d,10))
 
@@ -33,12 +33,13 @@ dc(i,d,n)=if(n<=0,0,(floor(mod(i,10))==d)+dc(i*10,d,n-1))
 vector2 hc_(t,n)=if(n==0, 
    (0,0), 
    let(
-      j=O-n+1;
-      q = t*10;
+      j=n+1;
+      q = t;
       qj=get_digit(q,j);
       e0=dc(q,0,j-1);
       e3=dc(q,3,j-1);
-      dj=e0+mod(e3,2);
+      //dj=e0+mod(e3,2);
+      dj=mod(e0+e3,2);
       hn=c_mult1( ((-1^e0)/(2^j))*sign(qj), ( (1-dj)*qj-1, 1-dj*qj));
       c_add(hc(t,n-1), hn)
    ))
